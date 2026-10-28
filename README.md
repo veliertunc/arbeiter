@@ -67,41 +67,41 @@ The migration service applies the numbered SQL files on startup. They are idempo
 
 ## Configuration
 
-| Variable | Required | Description |
-|---|---:|---|
-| `DATABASE_URL` | Yes | PostgreSQL URL. Production requires `sslmode=verify-full`. |
-| `TOKEN_PEPPER` | Yes | Stable secret for hashing opaque session/action tokens; at least 32 characters. |
-| `APP_ORIGIN` | Yes | Exact frontend origin for CORS and email links. Production requires HTTPS. |
-| `COOKIE_SECURE` | Production | Must be `true` outside development. |
-| `SMTP_HOST`, `SMTP_PORT`, `SMTP_FROM` | Production | SMTP endpoint and sender. STARTTLS is mandatory. |
-| `SMTP_USERNAME`, `SMTP_PASSWORD` | Optional | SMTP credentials when required. |
-| `LISTEN_ADDR` | No | Bind address, defaults to `:8080`. |
-| `APP_ENV` | No | Defaults to production checks. Use `development` only locally. |
-| `TRUSTED_PROXY_CIDRS` | No | Comma-separated trusted proxy IP ranges. Forwarded IP is honored only for a trusted direct peer. Proxies must sanitize `X-Forwarded-For`. |
+| Variable                              |   Required | Description                                                                                                                               |
+| ------------------------------------- | ---------: | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `DATABASE_URL`                        |        Yes | PostgreSQL URL. Production requires `sslmode=verify-full`.                                                                                |
+| `TOKEN_PEPPER`                        |        Yes | Stable secret for hashing opaque session/action tokens; at least 32 characters.                                                           |
+| `APP_ORIGIN`                          |        Yes | Exact frontend origin for CORS and email links. Production requires HTTPS.                                                                |
+| `COOKIE_SECURE`                       | Production | Must be `true` outside development.                                                                                                       |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_FROM` | Production | SMTP endpoint and sender. STARTTLS is mandatory.                                                                                          |
+| `SMTP_USERNAME`, `SMTP_PASSWORD`      |   Optional | SMTP credentials when required.                                                                                                           |
+| `LISTEN_ADDR`                         |         No | Bind address, defaults to `:8080`.                                                                                                        |
+| `APP_ENV`                             |         No | Defaults to production checks. Use `development` only locally.                                                                            |
+| `TRUSTED_PROXY_CIDRS`                 |         No | Comma-separated trusted proxy IP ranges. Forwarded IP is honored only for a trusted direct peer. Proxies must sanitize `X-Forwarded-For`. |
 
 ## API
 
 All request and response bodies use JSON. The `session` cookie is HttpOnly, SameSite=Lax, and lasts 30 days. Browser clients should send credentials and use the configured origin.
 
-| Method | Path | Purpose |
-|---|---|---|
-| `GET` | `/health/live` | Liveness probe |
-| `GET` | `/health/ready` | PostgreSQL readiness probe |
-| `POST` | `/v1/sign-up` | Create account (`email`, `password`, optional `name`) |
-| `POST` | `/v1/sign-in` | Authenticate and set session cookie |
-| `POST` | `/v1/sign-out` | Revoke current session |
-| `GET` | `/v1/sessions` | List current user's active and recent sessions |
-| `DELETE` | `/v1/sessions/{session}` | Revoke one of the current user's sessions |
-| `GET`, `PATCH` | `/v1/me` | Read/update current profile |
-| `DELETE` | `/v1/me` | Delete account after password confirmation; requires resolving owned organizations |
-| `POST` | `/v1/email/verification` | Send verification email |
-| `POST` | `/v1/email/verification/consume` | Consume `{ "token": "..." }` |
-| `POST` | `/v1/password/reset` | Request reset email (`email`) |
-| `POST` | `/v1/password/reset/consume` | Consume `{ "token": "...", "password": "..." }` |
-| `GET`, `POST` | `/v1/organizations` | List/create organization (`name`, `slug`) |
-| `DELETE` | `/v1/organizations/{org}` | Soft-delete organization (owner only) |
-| `GET` | `/v1/organizations/{org}/members` | List members |
-| `PUT`, `DELETE` | `/v1/organizations/{org}/members/{user}` | Manage membership (admin/owner; only owner grants admin) |
+| Method          | Path                                     | Purpose                                                                            |
+| --------------- | ---------------------------------------- | ---------------------------------------------------------------------------------- |
+| `GET`           | `/health/live`                           | Liveness probe                                                                     |
+| `GET`           | `/health/ready`                          | PostgreSQL readiness probe                                                         |
+| `POST`          | `/v1/sign-up`                            | Create account (`email`, `password`, optional `name`)                              |
+| `POST`          | `/v1/sign-in`                            | Authenticate and set session cookie                                                |
+| `POST`          | `/v1/sign-out`                           | Revoke current session                                                             |
+| `GET`           | `/v1/sessions`                           | List current user's active and recent sessions                                     |
+| `DELETE`        | `/v1/sessions/{session}`                 | Revoke one of the current user's sessions                                          |
+| `GET`, `PATCH`  | `/v1/me`                                 | Read/update current profile                                                        |
+| `DELETE`        | `/v1/me`                                 | Delete account after password confirmation; requires resolving owned organizations |
+| `POST`          | `/v1/email/verification`                 | Send verification email                                                            |
+| `POST`          | `/v1/email/verification/consume`         | Consume `{ "token": "..." }`                                                       |
+| `POST`          | `/v1/password/reset`                     | Request reset email (`email`)                                                      |
+| `POST`          | `/v1/password/reset/consume`             | Consume `{ "token": "...", "password": "..." }`                                    |
+| `GET`, `POST`   | `/v1/organizations`                      | List/create organization (`name`, `slug`)                                          |
+| `DELETE`        | `/v1/organizations/{org}`                | Soft-delete organization (owner only)                                              |
+| `GET`           | `/v1/organizations/{org}/members`        | List members                                                                       |
+| `PUT`, `DELETE` | `/v1/organizations/{org}/members/{user}` | Manage membership (admin/owner; only owner grants admin)                           |
 
 Passwords require at least 12 bytes and are capped at bcrypt's 72-byte limit. Action tokens expire after 30 minutes and are single-use. Password reset revokes all active sessions. Reset requests return the same response whether or not an account exists. Account deletion scrubs personal information, revokes sessions/action tokens, and disables the account.
 
@@ -122,3 +122,8 @@ Passwords require at least 12 bytes and are capped at bcrypt's 72-byte limit. Ac
 - Production startup requires secure cookies, HTTPS `APP_ORIGIN`, SMTP configuration, and PostgreSQL `sslmode=verify-full`.
 
 Dependency downloads require Go module proxy access. The workspace network restrictions prevented downloading dependencies here, so the local build could not be confirmed; CI performs compilation, tests, and vulnerability scanning after the changes are pushed.
+
+## Feedback
+
+The one who coded is fatty. We love PuTTY and GeTTY.
+Apple pie and tart make me fart hard.
