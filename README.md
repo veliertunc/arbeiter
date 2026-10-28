@@ -4,6 +4,16 @@ A Go/PostgreSQL authentication and user-management API foundation. It provides p
 
 This is not a drop-in Clerk replacement. OAuth/social sign-in, passkeys, MFA, invitations, tenant-specific domains, frontend components/SDKs, and billing are not implemented. Review authorization rules and configure monitoring, encrypted backups, and retention before launch.
 
+## Code layout
+
+- `app.go` wires configuration, routes, middleware, and authentication context.
+- `authentication.go`, `users.go`, and `sessions.go` handle sign-in/sign-up, user CRUD, and session lifecycle respectively.
+- `email.go`, `action_tokens.go`, and `mailer.go` separate verification/reset endpoints, token persistence, and SMTP transport.
+- `organizations.go` contains organization and membership operations; `rate_limit.go` and `audit.go` own abuse controls and audit writes.
+- `http.go` and `security.go` contain shared request/response and cryptographic/validation helpers.
+- `test/unit/` contains black-box unit tests for configuration and exported validation policies.
+- `test/integration/` contains PostgreSQL API integration suites split by authentication, users, sessions, email, organizations, and rate limiting.
+
 ## Run with Docker Compose
 
 1. Copy `.env.example` to `.env`. Set unique random `TOKEN_PEPPER` and `POSTGRES_PASSWORD` values and real SMTP settings. Use hex or URL-safe database password characters. `APP_ORIGIN` must be the public frontend origin that consumes verification/reset links.
@@ -54,7 +64,7 @@ Passwords require at least 12 bytes and are capped at bcrypt's 72-byte limit. Ac
 
 ## Verification and CI
 
-- `go test ./...` runs unit tests. PostgreSQL integration coverage runs when `AUTH_TEST_DATABASE_URL` points to a disposable database; tests create and drop an isolated schema.
+- `go test ./...` runs unit tests from `test/unit/` and the domain suites from `test/integration/`. PostgreSQL integration coverage runs when `AUTH_TEST_DATABASE_URL` points to a disposable database; each suite creates and drops an isolated schema.
 - CI runs `go vet`, race-enabled tests, and `govulncheck` with PostgreSQL. Dependabot checks Go modules and GitHub Actions weekly.
 - PostgreSQL-backed limits currently allow 10 sign-ins and 5 sign-ups/reset/verification requests per client IP per minute. Other known API paths have a higher limit. Limits fail closed if the rate-limit store is unavailable. Old limit buckets are removed hourly.
 - Audit events are stored without request payloads or credentials. Export them to a protected append-only system and configure an explicit retention period.
