@@ -1,0 +1,8 @@
+---
+const { post, index } = Astro.props;
+---
+<a class="post" href={`/posts/${post.slug}`}>
+  <div class:list={["art", `art-${index}`]}><div class="art-circle"></div><span>0{index + 1}</span></div>
+  <div class="meta"><span>{post.category}</span><span>{post.date}</span></div>
+  <h3>{post.title}</h3><p>{post.summary}</p><span class="read">Read article <b>↗</b></span>
+</a>

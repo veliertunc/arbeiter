@@ -1,16 +1,15 @@
-import AuthPanel from "./ui/AuthPanel";
-
-const features = [
-  { icon: "◉", title: "Identity, made simple", text: "A clean API for user accounts, profiles, and secure sign-in." },
-  { icon: "⌂", title: "Built for teams", text: "Organizations and role-aware membership, ready for multi-tenant products." },
-  { icon: "◷", title: "Sessions you control", text: "Server-managed sessions with revocation and clear security boundaries." },
-];
+import { DemoSection } from "../components/home/DemoSection";
+import { FeatureSection } from "../components/home/FeatureSection";
+import { Footer } from "../components/home/Footer";
+import { Hero } from "../components/home/Hero";
+import { Navigation } from "../components/home/Navigation";
 
 export default function Home() {
-  return <main><nav className="nav"><a className="brand" href="#"><span>a</span> arbeiter</a><div className="nav-links"><a href="#platform">Platform</a><a href="http://localhost:4322">Docs</a><a href="http://localhost:4321">Journal</a></div><a className="nav-button" href="#demo">Open dashboard <span>↗</span></a></nav>
-    <section className="hero"><div className="hero-copy"><div className="badge"><i/> AUTH INFRASTRUCTURE, REIMAGINED</div><h1>Identity that<br/>moves <em>with you.</em></h1><p>Give your product a secure foundation for every sign-in, user, and team. Ship the experience you imagined.</p><div className="hero-actions"><a className="button primary" href="#demo">Get started <span>→</span></a><a className="button ghost" href="http://localhost:4322">Explore the docs ↗</a></div><div className="trusted"><span className="avatars"><i>A</i><i>M</i><i>J</i></span><span>Built for teams who care about identity</span></div></div><div className="hero-visual"><div className="glow"/><div className="visual-ring ring-a"/><div className="visual-ring ring-b"/><div className="auth-card"><div className="auth-card-head"><span className="mini-mark">a</span><span className="secure">🔒 SECURE SESSION</span></div><div className="person"><div className="person-avatar">A</div><div><b>Alex Morgan</b><small>alex@northstar.studio</small></div><span className="verified">✓</span></div><div className="card-divider"/><div className="status-row"><span>Account status</span><b><i/> Verified</b></div><div className="status-row"><span>Active session</span><b>Just now</b></div><div className="card-footer"><span>Connected to <b>Northstar Studio</b></span><span>↗</span></div></div><div className="floating float-one">✦ &nbsp; Email verified</div><div className="floating float-two"><i/> Session protected</div></div><div className="hero-bottom"><span>BUILT ON OPEN STANDARDS</span><div><b>REST API</b><b>OPEN SDKs</b><b>SECURE BY DEFAULT</b></div></div></section>
-    <section className="features" id="platform"><div className="section-title"><span>THE PLATFORM</span><h2>Everything you need.<br/><em>Nothing in your way.</em></h2><p>Identity should be the part of your product you never have to worry about.</p></div><div className="feature-grid">{features.map(f=><article key={f.title}><span className="feature-icon">{f.icon}</span><h3>{f.title}</h3><p>{f.text}</p><a href="http://localhost:4322">Learn more ↗</a></article>)}</div></section>
-    <section className="demo" id="demo"><div><span>TRY IT YOURSELF</span><h2>Your identity workspace,<br/>ready when you are.</h2><p>Connect to your Arbeiter Auth API and sign in to see your account.</p></div><AuthPanel/></section>
-    <footer><a className="brand" href="#"><span>a</span> arbeiter</a><span>Thoughtful identity infrastructure.</span><div><a href="http://localhost:4322">Documentation</a><a href="http://localhost:4321">Journal</a></div><small>© 2026 Arbeiter Auth</small></footer>
-  </main>;
+  return <>
+    <Navigation />
+    <Hero />
+    <FeatureSection />
+    <DemoSection />
+    <Footer />
+  </>;
 }

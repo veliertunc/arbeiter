@@ -8,6 +8,9 @@
 node_modules/
 .next/
 .astro/
+apps/api/dist/
+apps/blog/dist/
+apps/docs/dist/
 apps/mobile/.expo/
 apps/mobile/dist/
 sdk/java/target/

@@ -37,6 +37,8 @@ The frontend workspace contains five deployable apps:
 - `apps/web/`: Next.js product site with a sign-in demo powered by the JavaScript SDK.
 - `apps/mobile/`: Expo iOS/Android sign-in and account screen. The SDK uses Expo SecureStore to persist the session cookie.
 
+The API console separates tRPC transport, session forwarding, state hooks, and screen components. The web app composes its landing page from section components and keeps auth state in a hook. The mobile app separates its SDK/SecureStore adapter, auth hook, screen, and reusable form/header components. The Astro blog keeps article data separate from its article card and route templates; the docs are divided by API topic and SDK.
+
 Install workspace dependencies once with `npm install`. Start the Go API and PostgreSQL service using the Docker Compose instructions above, then run the desired app from the repository root:
 
 ```sh
