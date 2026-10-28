@@ -1,0 +1,23 @@
+idf_component_register(
+    SRCS
+        "app_main.c"
+        "auth_client.c"
+        "sd_card.c"
+        "time_sync.c"
+        "wifi_station.c"
+    INCLUDE_DIRS "."
+    REQUIRES
+        esp_driver_spi
+        esp_driver_sdspi
+        fatfs
+        sdmmc
+        esp_http_client
+        esp_event
+        esp_netif
+        esp_wifi
+        nvs_flash
+        esp_timer
+        log
+        json
+        mbedtls
+)

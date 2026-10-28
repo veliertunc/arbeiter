@@ -13,6 +13,16 @@ apps/blog/dist/
 apps/docs/dist/
 apps/mobile/.expo/
 apps/mobile/dist/
+apps/esp32/build/
+apps/esp32/sdkconfig
+apps/esp32/sdkconfig.old
+apps/esp32/managed_components/
+apps/esp32/dependencies.lock
+apps/stm32/nucleo-f746zg/Debug/
+apps/stm32/nucleo-f746zg/Release/
+apps/stm32/nucleo-f746zg/Drivers/
+apps/stm32/nucleo-f746zg/.settings/
+apps/stm32/nucleo-f746zg/Core/Inc/auth_config.local.h
 sdk/java/target/
 sdk/rs/target/
 __pycache__/

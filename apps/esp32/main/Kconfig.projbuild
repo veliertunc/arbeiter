@@ -1,0 +1,54 @@
+menu "Arbeiter ESP32 Auth Demo"
+
+config APP_WIFI_SSID
+    string "Wi-Fi network name"
+    default ""
+
+config APP_WIFI_PASSWORD
+    string "Wi-Fi password"
+    default ""
+    help
+        Stored in local sdkconfig and compiled into firmware. Do not commit sdkconfig.
+
+config APP_AUTH_BASE_URL
+    string "Authentication API base URL"
+    default "https://auth.example.com"
+
+config APP_ALLOW_INSECURE_HTTP
+    bool "Allow unencrypted HTTP (development only)"
+    default n
+    help
+        Sends the account password and session cookie without transport encryption.
+        Never enable this on an untrusted network or in a production build.
+
+config APP_AUTH_EMAIL
+    string "Demo account email"
+    default ""
+
+config APP_AUTH_PASSWORD
+    string "Demo account password"
+    default ""
+    help
+        Stored in local sdkconfig and compiled into firmware. Use only a dedicated test account.
+
+config APP_SD_MOSI_GPIO
+    int "SD card SPI MOSI GPIO"
+    range 0 39
+    default 23
+
+config APP_SD_MISO_GPIO
+    int "SD card SPI MISO GPIO"
+    range 0 39
+    default 19
+
+config APP_SD_SCLK_GPIO
+    int "SD card SPI clock GPIO"
+    range 0 39
+    default 18
+
+config APP_SD_CS_GPIO
+    int "SD card SPI chip-select GPIO"
+    range 0 39
+    default 5
+
+endmenu
