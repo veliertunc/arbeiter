@@ -1,0 +1,13 @@
+---
+title: JavaScript SDK
+description: Use the Arbeiter Auth JavaScript client.
+---
+
+```js
+import { AuthClient, AuthError } from "@arbeiter/auth-sdk";
+const auth = new AuthClient({ baseURL: "https://auth.example.com" });
+await auth.signIn(email, password);
+const user = await auth.me();
+```
+
+Browser requests include credentials by default. Keep clients scoped to one user session in server applications.

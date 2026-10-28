@@ -1,0 +1,13 @@
+{
+  "name": "arbeiter-platform",
+  "private": true,
+  "type": "module",
+  "workspaces": ["sdk/js", "apps/api", "apps/blog", "apps/docs", "apps/web", "apps/mobile"],
+  "scripts": {
+    "dev:api": "npm run dev --workspace @arbeiter/api-console",
+    "dev:blog": "npm run dev --workspace @arbeiter/blog",
+    "dev:docs": "npm run dev --workspace @arbeiter/docs",
+    "dev:web": "npm run dev --workspace @arbeiter/web",
+    "dev:mobile": "npm run start --workspace @arbeiter/mobile"
+  }
+}

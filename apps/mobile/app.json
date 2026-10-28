@@ -1,0 +1,1 @@
+{"expo":{"name":"Arbeiter Auth","slug":"arbeiter-auth","version":"0.1.0","orientation":"portrait","userInterfaceStyle":"light","ios":{"supportsTablet":true,"config":{"usesNonExemptEncryption":false}},"android":{"package":"dev.arbeiter.auth"},"plugins":[["expo-secure-store",{"faceIDPermission":"Allow Arbeiter Auth to protect your session."}]]}}

@@ -1,0 +1,13 @@
+---
+title: Rust SDK
+description: Use the Arbeiter Auth Rust client.
+---
+
+```rust
+use arbeiter_auth_sdk::AuthClient;
+let auth = AuthClient::new("https://auth.example.com")?;
+auth.sign_in("you@example.com", "your-password")?;
+let user = auth.me()?;
+```
+
+Keep a client scoped to one user's session.

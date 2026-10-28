@@ -1,0 +1,27 @@
+---
+title: API reference
+description: HTTP endpoints exposed by Arbeiter Auth.
+---
+
+All endpoints use JSON. Authenticated requests send the `session` cookie. The REST API is shared by all supported SDKs.
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| POST | `/v1/sign-up` | Create an account |
+| POST | `/v1/sign-in` | Authenticate and create a session |
+| POST | `/v1/sign-out` | Revoke the current session |
+| GET | `/v1/me` | Read the current user |
+| PATCH | `/v1/me` | Update the current profile |
+| DELETE | `/v1/me` | Delete the account after password confirmation |
+| GET | `/v1/sessions` | List sessions |
+| DELETE | `/v1/sessions/{session}` | Revoke a session |
+| POST | `/v1/email/verification` | Request verification email |
+| POST | `/v1/email/verification/consume` | Consume verification token |
+| POST | `/v1/password/reset` | Request password reset |
+| POST | `/v1/password/reset/consume` | Consume reset token |
+| GET, POST | `/v1/organizations` | List or create organizations |
+| DELETE | `/v1/organizations/{org}` | Delete an organization (owner only) |
+| GET | `/v1/organizations/{org}/members` | List members |
+| PUT, DELETE | `/v1/organizations/{org}/members/{user}` | Manage a membership |
+
+The local API base URL is `http://localhost:8080`. Production must use HTTPS.

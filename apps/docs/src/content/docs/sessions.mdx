@@ -1,0 +1,14 @@
+---
+title: Sessions
+description: Work with secure server-side sessions.
+---
+
+Sessions use opaque random tokens stored as hashes in PostgreSQL. The API sets an HttpOnly, SameSite=Lax `session` cookie. Production deployments require HTTPS and `COOKIE_SECURE=true`.
+
+```js
+const sessions = await auth.listSessions();
+await auth.revokeSession(sessionId);
+await auth.signOut();
+```
+
+Password resets revoke active sessions. Treat the SDK client as session-scoped in server runtimes; do not share one mutable client between unrelated users.

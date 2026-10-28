@@ -1,0 +1,24 @@
+---
+title: Getting started
+description: Connect your app to Arbeiter Auth.
+---
+
+Arbeiter Auth provides a Go and PostgreSQL API for email and password sign-in, server-managed sessions, profile management, email verification, password reset, and organizations.
+
+## Start the API
+
+Configure the environment in the project root and start the service with Docker Compose. The API listens on `http://localhost:8080` in local development.
+
+## Install the JavaScript SDK
+
+```sh
+npm install @arbeiter/auth-sdk
+```
+
+```js
+import { AuthClient } from "@arbeiter/auth-sdk";
+const auth = new AuthClient({ baseURL: "http://localhost:8080" });
+await auth.signUp("you@example.com", "a-long-unique-password", "Ada");
+```
+
+In a browser the SDK sends credentialed requests so the browser manages the HttpOnly session cookie. Configure `APP_ORIGIN` to the exact frontend origin.

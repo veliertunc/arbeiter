@@ -27,6 +27,30 @@ Each SDK wraps the same cookie-session REST API: account sign-up/sign-in, profil
 
 The tests under `sdk/test/` use mock HTTP servers/transports and do not require a running authentication service.
 
+## Product apps
+
+The frontend workspace contains five deployable apps:
+
+- `apps/api/`: React/Vite API console with a tRPC server. It forwards each browser session to the Go API through the JavaScript SDK.
+- `apps/blog/`: Astro journal with a landing page and article routes.
+- `apps/docs/`: Astro Starlight API and SDK documentation.
+- `apps/web/`: Next.js product site with a sign-in demo powered by the JavaScript SDK.
+- `apps/mobile/`: Expo iOS/Android sign-in and account screen. The SDK uses Expo SecureStore to persist the session cookie.
+
+Install workspace dependencies once with `npm install`. Start the Go API and PostgreSQL service using the Docker Compose instructions above, then run the desired app from the repository root:
+
+```sh
+npm run dev:api
+npm run dev:blog
+npm run dev:docs
+npm run dev:web
+npm run dev:mobile
+```
+
+Each command runs one app; use separate terminals for apps you want open together. The API console uses `apps/api/.env` (`AUTH_API_URL`, default `http://localhost:8080`); copy its `.env.example` as a starting point. The Next.js app reads `NEXT_PUBLIC_AUTH_API_URL`. Expo reads `EXPO_PUBLIC_AUTH_API_URL`; on an Android emulator use `http://10.0.2.2:8080`, and on a physical phone use the computer's LAN address. For browser sign-in on the web app, configure the Go API's `APP_ORIGIN` to the web app origin.
+
+Local app addresses are API console `http://localhost:5173`, blog `http://localhost:4321`, docs `http://localhost:4322`, web `http://localhost:3000`, and the Expo development launcher. Deploy each app independently and replace local cross-links and API origins with the deployed domains.
+
 ## Run with Docker Compose
 
 1. Copy `.env.example` to `.env`. Set unique random `TOKEN_PEPPER` and `POSTGRES_PASSWORD` values and real SMTP settings. Use hex or URL-safe database password characters. `APP_ORIGIN` must be the public frontend origin that consumes verification/reset links.

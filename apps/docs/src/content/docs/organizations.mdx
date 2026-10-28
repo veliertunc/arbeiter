@@ -1,0 +1,15 @@
+---
+title: Organizations
+description: Organization and membership operations.
+---
+
+Organizations have an owner and a unique slug. Membership roles are `member`, `admin`, and `owner`. Only an owner can grant admin privileges; owners cannot remove or demote themselves. Account deletion is blocked while a user still owns an organization.
+
+```js
+const organizations = await auth.listOrganizations();
+await auth.createOrganization("Acme", "acme");
+const members = await auth.listMembers(organizationId);
+await auth.upsertMember(organizationId, userId, "member");
+```
+
+Every operation is authorized server-side. A client-provided organization ID is not proof of access.

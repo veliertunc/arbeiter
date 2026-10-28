@@ -1,0 +1,13 @@
+---
+title: Python SDK
+description: Use the Arbeiter Auth Python client.
+---
+
+```python
+from arbeiter_auth import AuthClient
+auth = AuthClient("https://auth.example.com")
+auth.sign_in("you@example.com", "your-password")
+user = auth.me()
+```
+
+Reuse a client to retain its cookie jar. Create separate clients for unrelated users.

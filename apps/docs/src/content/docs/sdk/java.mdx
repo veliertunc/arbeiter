@@ -1,0 +1,12 @@
+---
+title: Java SDK
+description: Use the Arbeiter Auth Java client.
+---
+
+```java
+var auth = new AuthClient(URI.create("https://auth.example.com"));
+auth.signIn("you@example.com", "your-password");
+var user = auth.me();
+```
+
+The JDK HTTP client retains session cookies for the lifetime of the client. Scope clients to one user session.

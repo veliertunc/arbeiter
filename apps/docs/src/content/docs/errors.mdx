@@ -1,0 +1,15 @@
+---
+title: Errors and security
+description: Error handling and deployment essentials.
+---
+
+Errors are JSON with a `message`. The JavaScript SDK throws `AuthError` with the HTTP status and response payload.
+
+```js
+try { await auth.me(); }
+catch (error) {
+  if (error.status === 401) { /* Ask the user to sign in again. */ }
+}
+```
+
+Production requires secure cookies, an HTTPS `APP_ORIGIN`, authenticated SMTP, and PostgreSQL TLS verification. Keep secrets out of logs. OAuth, passkeys, MFA, and hosted UI components are not implemented yet.

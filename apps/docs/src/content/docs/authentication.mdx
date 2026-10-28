@@ -1,0 +1,20 @@
+---
+title: Authentication
+description: Sign-up, sign-in, and account recovery.
+---
+
+## Sign up and sign in
+
+`POST /v1/sign-up` accepts `email`, `password`, and optional `name`. Passwords require at least 12 bytes and cannot exceed bcrypt's 72-byte input limit.
+
+```js
+await auth.signUp("you@example.com", password, "Ada");
+await auth.signIn("you@example.com", password);
+const user = await auth.me();
+```
+
+Sign-in returns an HttpOnly `session` cookie. Do not read or store this cookie from browser JavaScript. Use the SDK's credential mode and send requests to the configured API origin.
+
+## Verification and recovery
+
+Use `auth.requestEmailVerification()` and then `auth.verifyEmail(token)`. Password recovery uses `auth.requestPasswordReset(email)` followed by `auth.resetPassword(token, newPassword)`. Reset revokes active sessions.

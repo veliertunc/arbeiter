@@ -1,0 +1,12 @@
+---
+title: C and C++ SDK
+description: Use the Arbeiter Auth C and C++ clients.
+---
+
+```cpp
+#include <arbeiter_auth/client.hpp>
+arbeiter_auth::AuthClient auth("https://auth.example.com");
+auto result = auth.sign_in("you@example.com", "your-password");
+```
+
+The C++ client retains a session cookie. The `arbeiter_auth/c_api.h` header exposes a C interface. Link libcurl and nlohmann/json.

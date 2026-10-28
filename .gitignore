@@ -5,3 +5,13 @@
 /coverage.html
 /dist/
 *.log
+node_modules/
+.next/
+.astro/
+apps/mobile/.expo/
+apps/mobile/dist/
+sdk/java/target/
+sdk/rs/target/
+__pycache__/
+*.py[cod]
+build/
