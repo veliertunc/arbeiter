@@ -1,0 +1,46 @@
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: auth
+      POSTGRES_USER: auth
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U auth -d auth"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+  migrate:
+    image: postgres:17-alpine
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGPASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+    volumes:
+      - ./migrations:/migrations:ro
+    command: ["sh", "-c", "psql -v ON_ERROR_STOP=1 -h db -U auth -d auth -f /migrations/001_init.sql"]
+    restart: "no"
+  app:
+    build: .
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL: postgres://auth:${POSTGRES_PASSWORD}@db:5432/auth?sslmode=disable
+      TOKEN_PEPPER: ${TOKEN_PEPPER:?set TOKEN_PEPPER}
+      APP_ORIGIN: ${APP_ORIGIN:?set APP_ORIGIN}
+      COOKIE_SECURE: "true"
+      SMTP_HOST: ${SMTP_HOST:?set SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_FROM: ${SMTP_FROM:?set SMTP_FROM}
+      SMTP_USERNAME: ${SMTP_USERNAME:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+    ports:
+      - "127.0.0.1:8080:8080"
+    restart: unless-stopped
+volumes:
+  postgres-data:
