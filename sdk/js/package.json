@@ -1,0 +1,12 @@
+{
+  "name": "@arbeiter/auth-sdk",
+  "version": "0.1.0",
+  "description": "JavaScript client for the Arbeiter authentication API",
+  "type": "module",
+  "exports": "./index.js",
+  "scripts": {
+    "test": "node --test ../../sdk/test/js/*.test.js"
+  },
+  "engines": { "node": ">=20" },
+  "license": "MIT"
+}

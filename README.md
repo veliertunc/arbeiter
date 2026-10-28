@@ -2,7 +2,7 @@
 
 A Go/PostgreSQL authentication and user-management API foundation. It provides password sign-up/sign-in, opaque server-side sessions in HttpOnly cookies, email verification and password-reset tokens, profile and account lifecycle management, organizations, membership roles, session controls, PostgreSQL-backed throttling, and audit events.
 
-This is not a drop-in Clerk replacement. OAuth/social sign-in, passkeys, MFA, invitations, tenant-specific domains, frontend components/SDKs, and billing are not implemented. Review authorization rules and configure monitoring, encrypted backups, and retention before launch.
+This is not a drop-in Clerk replacement. OAuth/social sign-in, passkeys, MFA, invitations, tenant-specific domains, hosted frontend components, and billing are not implemented. Review authorization rules and configure monitoring, encrypted backups, and retention before launch.
 
 ## Code layout
 
@@ -13,6 +13,19 @@ This is not a drop-in Clerk replacement. OAuth/social sign-in, passkeys, MFA, in
 - `http.go` and `security.go` contain shared request/response and cryptographic/validation helpers.
 - `test/unit/` contains black-box unit tests for configuration and exported validation policies.
 - `test/integration/` contains PostgreSQL API integration suites split by authentication, users, sessions, email, organizations, and rate limiting.
+- `sdk/{js,rs,cpp,py,java}/` contains the language clients; matching SDK tests live in `sdk/test/{js,rs,cpp,py,java}/`.
+
+## Language SDKs
+
+Each SDK wraps the same cookie-session REST API: account sign-up/sign-in, profile and account lifecycle, sessions, email verification/password reset, organizations, and membership management. Reuse a client instance to retain its session. Browser JavaScript uses credentialed requests so the browser can manage the HttpOnly cookie; server-side clients keep the cookie in the client instance.
+
+- JavaScript: `cd sdk/js && npm test` (Node.js 20+; no runtime dependencies).
+- Python: `python -m unittest discover -s sdk/test/py -p 'test_*.py'` (Python 3.10+; standard library).
+- Rust: `cargo test --manifest-path sdk/rs/Cargo.toml`.
+- C and C++: configure/build/test with CMake from `sdk/cpp`; requires libcurl and nlohmann/json. The C++ client exposes the full API, with a C-compatible API in `arbeiter_auth/c_api.h`.
+- Java: `mvn --file sdk/java/pom.xml test` (Java 17+).
+
+The tests under `sdk/test/` use mock HTTP servers/transports and do not require a running authentication service.
 
 ## Run with Docker Compose
 
