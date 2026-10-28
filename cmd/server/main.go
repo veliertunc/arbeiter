@@ -6,6 +6,7 @@ import (
 	"errors"
 	"log/slog"
 	"net/http"
+	"net/url"
 	"os"
 	"os/signal"
 	"strings"
@@ -18,11 +19,19 @@ import (
 
 func main() {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
-	if os.Getenv("DATABASE_URL") == "" {
+	databaseURL := strings.TrimSpace(os.Getenv("DATABASE_URL"))
+	if databaseURL == "" {
 		logger.Error("DATABASE_URL is required")
 		os.Exit(1)
 	}
-	db, err := sql.Open("pgx", os.Getenv("DATABASE_URL"))
+	if os.Getenv("APP_ENV") != "development" {
+		u, parseErr := url.Parse(databaseURL)
+		if parseErr != nil || (u.Scheme != "postgres" && u.Scheme != "postgresql") || u.Host == "" || u.Query().Get("sslmode") != "verify-full" {
+			logger.Error("DATABASE_URL must require sslmode=verify-full outside development")
+			os.Exit(1)
+		}
+	}
+	db, err := sql.Open("pgx", databaseURL)
 	if err != nil {
 		logger.Error("open database", "error", err)
 		os.Exit(1)
@@ -49,6 +58,17 @@ func main() {
 		if e := srv.ListenAndServe(); e != nil && !errors.Is(e, http.ErrServerClosed) {
 			logger.Error("http server", "error", e)
 			os.Exit(1)
+		}
+	}()
+	go func() {
+		ticker := time.NewTicker(time.Hour)
+		defer ticker.Stop()
+		for range ticker.C {
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			if _, e := db.ExecContext(ctx, `DELETE FROM rate_limits WHERE window_start < now()-interval '1 day'`); e != nil {
+				logger.Error("rate-limit cleanup failed", "error", e)
+			}
+			cancel()
 		}
 	}()
 	stop, done := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)

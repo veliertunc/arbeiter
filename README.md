@@ -1,57 +1,71 @@
 # Auth Platform
 
-A Go/PostgreSQL authentication and user-management API starter. It provides password sign-up/sign-in, opaque server-side sessions in HttpOnly cookies, email verification and password-reset tokens, profile management, organizations, and membership roles.
+A Go/PostgreSQL authentication and user-management API foundation. It provides password sign-up/sign-in, opaque server-side sessions in HttpOnly cookies, email verification and password-reset tokens, profile and account lifecycle management, organizations, membership roles, session controls, PostgreSQL-backed throttling, and audit events.
 
-This is a deployable foundation, not a drop-in Clerk replacement. A production launch still needs an operational email domain/provider, HTTPS termination, backups, monitoring, abuse controls, and security review. OAuth/social login, passkeys, MFA, invitations, tenant-specific domains, frontend components/SDKs, and billing are not implemented.
+This is not a drop-in Clerk replacement. OAuth/social sign-in, passkeys, MFA, invitations, tenant-specific domains, frontend components/SDKs, and billing are not implemented. Review authorization rules and configure monitoring, encrypted backups, and retention before launch.
 
-## Run locally with Docker Compose
+## Run with Docker Compose
 
-1. Copy `.env.example` to `.env`, then set unique random `TOKEN_PEPPER` and `POSTGRES_PASSWORD` values and real SMTP settings. `APP_ORIGIN` must be the public origin of the frontend that consumes verification/reset links.
+1. Copy `.env.example` to `.env`. Set unique random `TOKEN_PEPPER` and `POSTGRES_PASSWORD` values and real SMTP settings. Use hex or URL-safe database password characters. `APP_ORIGIN` must be the public frontend origin that consumes verification/reset links.
 2. Run `docker compose up --build`.
-3. The API listens on `127.0.0.1:8080`; put an HTTPS reverse proxy in front for production. Set `COOKIE_SECURE=true` in production.
+3. The API listens on `127.0.0.1:8080`. Compose uses development mode for its private local database. Put an HTTPS reverse proxy in front before production use.
 
-The migration service applies `migrations/001_init.sql` on startup. Back up PostgreSQL regularly and test restoration. Store secrets in a secrets manager in production rather than a checked-in environment file.
+The migration service applies the numbered SQL files on startup. They are idempotent, but use a migration runner with recorded versions for future schema changes. Back up PostgreSQL regularly, test restoration, and store production secrets in a secrets manager.
 
 ## Configuration
 
 | Variable | Required | Description |
 |---|---:|---|
-| `DATABASE_URL` | Yes | PostgreSQL connection URL. Use TLS (`sslmode=verify-full`) outside local Compose. |
-| `TOKEN_PEPPER` | Yes | Secret used to hash opaque session and action tokens; minimum 32 characters. Keep stable and secret. |
-| `APP_ORIGIN` | Yes for email flows | Exact frontend origin used to construct verification/reset links and CORS allowlist. |
-| `COOKIE_SECURE` | Production | Set to `true` when served over HTTPS. |
-| `SMTP_HOST`, `SMTP_PORT`, `SMTP_FROM` | Email flows | SMTP endpoint and sender. SMTP server must support STARTTLS. |
+| `DATABASE_URL` | Yes | PostgreSQL URL. Production requires `sslmode=verify-full`. |
+| `TOKEN_PEPPER` | Yes | Stable secret for hashing opaque session/action tokens; at least 32 characters. |
+| `APP_ORIGIN` | Yes | Exact frontend origin for CORS and email links. Production requires HTTPS. |
+| `COOKIE_SECURE` | Production | Must be `true` outside development. |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_FROM` | Production | SMTP endpoint and sender. STARTTLS is mandatory. |
 | `SMTP_USERNAME`, `SMTP_PASSWORD` | Optional | SMTP credentials when required. |
 | `LISTEN_ADDR` | No | Bind address, defaults to `:8080`. |
+| `APP_ENV` | No | Defaults to production checks. Use `development` only locally. |
+| `TRUSTED_PROXY_CIDRS` | No | Comma-separated trusted proxy IP ranges. Forwarded IP is honored only for a trusted direct peer. Proxies must sanitize `X-Forwarded-For`. |
 
 ## API
 
-All request/response bodies use JSON. Session cookie is named `session`; it is HttpOnly, SameSite=Lax, and lasts 30 days. Browser clients should send credentials and use the exact configured origin.
+All request and response bodies use JSON. The `session` cookie is HttpOnly, SameSite=Lax, and lasts 30 days. Browser clients should send credentials and use the configured origin.
 
 | Method | Path | Purpose |
 |---|---|---|
 | `GET` | `/health/live` | Liveness probe |
-| `GET` | `/health/ready` | Database readiness probe |
+| `GET` | `/health/ready` | PostgreSQL readiness probe |
 | `POST` | `/v1/sign-up` | Create account (`email`, `password`, optional `name`) |
 | `POST` | `/v1/sign-in` | Authenticate and set session cookie |
 | `POST` | `/v1/sign-out` | Revoke current session |
+| `GET` | `/v1/sessions` | List current user's active and recent sessions |
+| `DELETE` | `/v1/sessions/{session}` | Revoke one of the current user's sessions |
 | `GET`, `PATCH` | `/v1/me` | Read/update current profile |
+| `DELETE` | `/v1/me` | Delete account after password confirmation; requires resolving owned organizations |
 | `POST` | `/v1/email/verification` | Send verification email |
 | `POST` | `/v1/email/verification/consume` | Consume `{ "token": "..." }` |
 | `POST` | `/v1/password/reset` | Request reset email (`email`) |
 | `POST` | `/v1/password/reset/consume` | Consume `{ "token": "...", "password": "..." }` |
 | `GET`, `POST` | `/v1/organizations` | List/create organization (`name`, `slug`) |
+| `DELETE` | `/v1/organizations/{org}` | Soft-delete organization (owner only) |
 | `GET` | `/v1/organizations/{org}/members` | List members |
-| `PUT`, `DELETE` | `/v1/organizations/{org}/members/{user}` | Manage membership (admin/owner) |
+| `PUT`, `DELETE` | `/v1/organizations/{org}/members/{user}` | Manage membership (admin/owner; only owner grants admin) |
 
-Passwords require at least 12 bytes and are capped at bcrypt's 72-byte limit. Action tokens expire after 30 minutes and are single-use. Resetting a password revokes the account's active sessions. Reset requests return the same response whether or not an account exists.
+Passwords require at least 12 bytes and are capped at bcrypt's 72-byte limit. Action tokens expire after 30 minutes and are single-use. Password reset revokes all active sessions. Reset requests return the same response whether or not an account exists. Account deletion scrubs personal information, revokes sessions/action tokens, and disables the account.
 
-## Security and operations
+## Verification and CI
 
-- Put the API behind a TLS reverse proxy with request size, connection, and per-IP rate limits. This service does not implement distributed rate limiting; add it at the edge before public exposure.
-- Configure SMTP with authenticated STARTTLS and monitor delivery failures. Tokens are stored hashed, never returned by API, and never logged.
+- `go test ./...` runs unit tests. PostgreSQL integration coverage runs when `AUTH_TEST_DATABASE_URL` points to a disposable database; tests create and drop an isolated schema.
+- CI runs `go vet`, race-enabled tests, and `govulncheck` with PostgreSQL. Dependabot checks Go modules and GitHub Actions weekly.
+- PostgreSQL-backed limits currently allow 10 sign-ins and 5 sign-ups/reset/verification requests per client IP per minute. Other known API paths have a higher limit. Limits fail closed if the rate-limit store is unavailable. Old limit buckets are removed hourly.
+- Audit events are stored without request payloads or credentials. Export them to a protected append-only system and configure an explicit retention period.
+
+## Operations and security
+
+- Put the API behind TLS termination and keep edge connection, request-size, and abuse limits enabled. Built-in distributed limits supplement edge controls.
+- Set `TRUSTED_PROXY_CIDRS` only to known proxy networks; configure those proxies to sanitize forwarded headers.
+- Configure authenticated SMTP with STARTTLS and monitor delivery failures. Tokens are stored hashed, never returned by the API, and never logged.
 - Restrict database credentials to this service, require TLS for remote PostgreSQL, rotate credentials, and use encrypted backups.
-- Add an audit/event pipeline and alerting appropriate to your compliance needs. Keep application logs free of credentials and personal data.
-- Review organization authorization rules before use in a multi-tenant product. This starter has no invitation workflow or organization deletion API.
+- Organization owners cannot be demoted or removed. Only owners can grant admin. Account deletion is blocked until organization ownership has been transferred or the organization deleted.
+- Production startup requires secure cookies, HTTPS `APP_ORIGIN`, SMTP configuration, and PostgreSQL `sslmode=verify-full`.
 
-Dependency downloads and compilation require access to the Go module proxy; this workspace was created without network access, so the initial build has not been verified here.
+Dependency downloads require Go module proxy access. The workspace network restrictions prevented downloading dependencies here, so the local build could not be confirmed; CI performs compilation, tests, and vulnerability scanning after the changes are pushed.

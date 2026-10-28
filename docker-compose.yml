@@ -22,7 +22,7 @@ services:
       PGPASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
     volumes:
       - ./migrations:/migrations:ro
-    command: ["sh", "-c", "psql -v ON_ERROR_STOP=1 -h db -U auth -d auth -f /migrations/001_init.sql"]
+    command: ["sh", "-c", "psql -v ON_ERROR_STOP=1 -h db -U auth -d auth -f /migrations/001_init.sql && psql -v ON_ERROR_STOP=1 -h db -U auth -d auth -f /migrations/002_operations.sql"]
     restart: "no"
   app:
     build: .
@@ -30,6 +30,7 @@ services:
       migrate:
         condition: service_completed_successfully
     environment:
+      APP_ENV: development
       DATABASE_URL: postgres://auth:${POSTGRES_PASSWORD}@db:5432/auth?sslmode=disable
       TOKEN_PEPPER: ${TOKEN_PEPPER:?set TOKEN_PEPPER}
       APP_ORIGIN: ${APP_ORIGIN:?set APP_ORIGIN}
@@ -39,6 +40,7 @@ services:
       SMTP_FROM: ${SMTP_FROM:?set SMTP_FROM}
       SMTP_USERNAME: ${SMTP_USERNAME:-}
       SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      TRUSTED_PROXY_CIDRS: ${TRUSTED_PROXY_CIDRS:-}
     ports:
       - "127.0.0.1:8080:8080"
     restart: unless-stopped
