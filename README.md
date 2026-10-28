@@ -36,7 +36,7 @@ The frontend workspace contains five deployable apps:
 - `apps/docs/`: Astro Starlight API and SDK documentation.
 - `apps/web/`: Next.js product site with a sign-in demo powered by the JavaScript SDK.
 - `apps/mobile/`: Expo iOS/Android sign-in and account screen. The SDK uses Expo SecureStore to persist the session cookie.
-- `apps/esp32/`: ESP-IDF ESP32 demo using SDSPI/FAT SD storage and HTTPS auth requests.
+- `apps/esp32/`: ESP-IDF ESP32 touchscreen user manager using LVGL 9, ILI9341/XPT2046, and SQLite on `/sdcard/app.db`.
 - `apps/stm32/nucleo-f746zg/`: NUCLEO-F746ZG C firmware demo sending verified HTTPS auth requests over RJ45 Ethernet using lwIP, mbedTLS, CMSIS GPIO drivers, and FreeRTOS; see its README for CubeIDE setup and C SDK portability notes.
 
 The API console separates tRPC transport, session forwarding, state hooks, and screen components. The web app composes its landing page from section components and keeps auth state in a hook. The mobile app separates its SDK/SecureStore adapter, auth hook, screen, and reusable form/header components. The Astro blog keeps article data separate from its article card and route templates; the docs are divided by API topic and SDK.
@@ -53,7 +53,7 @@ npm run dev:mobile
 
 Each command runs one app; use separate terminals for apps you want open together. The API console uses `apps/api/.env` (`AUTH_API_URL`, default `http://localhost:8080`); copy its `.env.example` as a starting point. The Next.js app reads `NEXT_PUBLIC_AUTH_API_URL`. Expo reads `EXPO_PUBLIC_AUTH_API_URL`; on an Android emulator use `http://10.0.2.2:8080`, and on a physical phone use the computer's LAN address. For browser sign-in on the web app, configure the Go API's `APP_ORIGIN` to the web app origin.
 
-The ESP32 app is built separately with ESP-IDF. See `apps/esp32/README.md` for board wiring, menuconfig settings, TLS, and credential handling.
+The ESP32 app is built separately with ESP-IDF. See `apps/esp32/README.md` for TFT/SD wiring, menuconfig settings, and the local SQLite database behavior.
 
 Local app addresses are API console `http://localhost:5173`, blog `http://localhost:4321`, docs `http://localhost:4322`, web `http://localhost:3000`, and the Expo development launcher. Deploy each app independently and replace local cross-links and API origins with the deployed domains.
 

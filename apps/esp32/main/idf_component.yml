@@ -1,0 +1,13 @@
+dependencies:
+  idf: ">=5.5.4"
+  lvgl/lvgl:
+    version: "==9.5.0"
+    public: true
+  espressif/esp_lvgl_port:
+    version: "==2.9.0"
+  espressif/esp_lcd_ili9341:
+    version: "==2.1.0"
+  atanisoft/esp_lcd_touch_xpt2046:
+    version: "==1.0.6"
+  chunlinboss/esp_sqlite3:
+    version: "==0.2.2"

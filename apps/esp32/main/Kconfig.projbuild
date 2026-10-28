@@ -1,54 +1,73 @@
-menu "Arbeiter ESP32 Auth Demo"
+menu "Arbeiter ESP32 User Admin"
 
-config APP_WIFI_SSID
-    string "Wi-Fi network name"
-    default ""
-
-config APP_WIFI_PASSWORD
-    string "Wi-Fi password"
-    default ""
-    help
-        Stored in local sdkconfig and compiled into firmware. Do not commit sdkconfig.
-
-config APP_AUTH_BASE_URL
-    string "Authentication API base URL"
-    default "https://auth.example.com"
-
-config APP_ALLOW_INSECURE_HTTP
-    bool "Allow unencrypted HTTP (development only)"
-    default n
-    help
-        Sends the account password and session cookie without transport encryption.
-        Never enable this on an untrusted network or in a production build.
-
-config APP_AUTH_EMAIL
-    string "Demo account email"
-    default ""
-
-config APP_AUTH_PASSWORD
-    string "Demo account password"
-    default ""
-    help
-        Stored in local sdkconfig and compiled into firmware. Use only a dedicated test account.
-
-config APP_SD_MOSI_GPIO
-    int "SD card SPI MOSI GPIO"
+config APP_LCD_MOSI_GPIO
+    int "Shared SPI MOSI GPIO"
     range 0 39
     default 23
 
-config APP_SD_MISO_GPIO
-    int "SD card SPI MISO GPIO"
+config APP_LCD_MISO_GPIO
+    int "Shared SPI MISO GPIO"
     range 0 39
     default 19
 
-config APP_SD_SCLK_GPIO
-    int "SD card SPI clock GPIO"
+config APP_LCD_SCLK_GPIO
+    int "Shared SPI clock GPIO"
     range 0 39
     default 18
 
 config APP_SD_CS_GPIO
-    int "SD card SPI chip-select GPIO"
+    int "SD card chip-select GPIO"
     range 0 39
     default 5
+
+config APP_LCD_CS_GPIO
+    int "ILI9341 chip-select GPIO"
+    range 0 39
+    default 15
+
+config APP_LCD_DC_GPIO
+    int "ILI9341 data/command GPIO"
+    range 0 39
+    default 2
+
+config APP_LCD_RST_GPIO
+    int "ILI9341 reset GPIO"
+    range -1 39
+    default 4
+    help
+        Set to -1 when the display module does not expose reset.
+
+config APP_LCD_BACKLIGHT_GPIO
+    int "TFT backlight GPIO"
+    range -1 39
+    default 32
+    help
+        Set to -1 when the backlight is permanently wired on.
+
+config APP_LCD_BACKLIGHT_ACTIVE_LOW
+    bool "Backlight is active low"
+    default n
+
+config APP_TOUCH_CS_GPIO
+    int "XPT2046 chip-select GPIO"
+    range 0 39
+    default 33
+
+config APP_TOUCH_IRQ_GPIO
+    int "XPT2046 PENIRQ GPIO (-1 for polling only)"
+    range -1 39
+    default 34
+
+config APP_TOUCH_SWAP_XY
+    bool "Swap touch X and Y axes"
+    default n
+
+config APP_TOUCH_MIRROR_X
+    bool "Mirror touch X axis"
+    default n
+
+config APP_TOUCH_MIRROR_Y
+    bool "Mirror touch Y axis"
+    default n
 
 endmenu

@@ -2,16 +2,15 @@
 
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdint.h>
 
 #include "driver/sdspi_host.h"
 #include "driver/spi_master.h"
 #include "esp_log.h"
-#include "esp_timer.h"
 #include "esp_vfs_fat.h"
 #include "sdmmc_cmd.h"
 
 #define SD_MOUNT_POINT "/sdcard"
-#define SD_LOG_PATH SD_MOUNT_POINT "/arbeiter-auth.log"
 
 static const char *TAG = "sd_card";
 static sdmmc_card_t *s_card;
@@ -21,12 +20,13 @@ esp_err_t sd_card_mount(void)
 {
     const spi_host_device_t host_id = SPI2_HOST;
     const spi_bus_config_t bus_config = {
-        .mosi_io_num = CONFIG_APP_SD_MOSI_GPIO,
-        .miso_io_num = CONFIG_APP_SD_MISO_GPIO,
-        .sclk_io_num = CONFIG_APP_SD_SCLK_GPIO,
+        .mosi_io_num = CONFIG_APP_LCD_MOSI_GPIO,
+        .miso_io_num = CONFIG_APP_LCD_MISO_GPIO,
+        .sclk_io_num = CONFIG_APP_LCD_SCLK_GPIO,
         .quadwp_io_num = -1,
         .quadhd_io_num = -1,
-        .max_transfer_sz = 4096,
+        /* SPI2 is shared by SD, the ILI9341, and XPT2046. */
+        .max_transfer_sz = 240 * 20 * sizeof(uint16_t),
     };
 
     esp_err_t err = spi_bus_initialize(host_id, &bus_config, SDSPI_DEFAULT_DMA);
@@ -58,28 +58,6 @@ esp_err_t sd_card_mount(void)
 
     ESP_LOGI(TAG, "SD card mounted at %s", SD_MOUNT_POINT);
     sdmmc_card_print_info(stdout, s_card);
-    return ESP_OK;
-}
-
-esp_err_t sd_card_append_event(const char *event, int status_code)
-{
-    if (!s_card || !event) {
-        return ESP_ERR_INVALID_STATE;
-    }
-
-    FILE *file = fopen(SD_LOG_PATH, "a");
-    if (!file) {
-        ESP_LOGE(TAG, "Cannot open event log on SD card");
-        return ESP_FAIL;
-    }
-
-    const long long uptime_ms = (long long)(esp_timer_get_time() / 1000);
-    const int written = fprintf(file, "%lld,event=%s,status=%d\n", uptime_ms, event, status_code);
-    const int close_result = fclose(file);
-    if (written < 0 || close_result != 0) {
-        ESP_LOGE(TAG, "Failed to write event log");
-        return ESP_FAIL;
-    }
     return ESP_OK;
 }
 

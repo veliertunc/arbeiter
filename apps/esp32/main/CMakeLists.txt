@@ -1,23 +1,24 @@
 idf_component_register(
     SRCS
         "app_main.c"
-        "auth_client.c"
         "sd_card.c"
-        "time_sync.c"
-        "wifi_station.c"
-    INCLUDE_DIRS "."
+        "display/tft_display.c"
+        "users/user_repository.c"
+        "users/user_service.c"
+        "ui/user_screen.c"
+    INCLUDE_DIRS "." "display" "users" "ui"
     REQUIRES
         esp_driver_spi
+        esp_driver_gpio
         esp_driver_sdspi
         fatfs
         sdmmc
-        esp_http_client
-        esp_event
-        esp_netif
-        esp_wifi
-        nvs_flash
-        esp_timer
+        esp_lcd
+        esp_lcd_ili9341
+        esp_lcd_touch
+        esp_lcd_touch_xpt2046
+        esp_lvgl_port
+        lvgl
+        esp_sqlite3
         log
-        json
-        mbedtls
 )
